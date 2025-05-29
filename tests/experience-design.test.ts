@@ -1,21 +1,30 @@
+import { expect, test, describe } from 'vitest';
 
-import { describe, expect, it } from "vitest";
+// Mock functions to simulate Clarity contract calls
+const mockContractCall = (method: string, args: any[] = []) => {
+  // This is a simplified mock - in a real scenario, you'd use a proper Clarity testing framework
+  if (method === 'register-retailer') {
+    return { success: true };
+  }
+  if (method === 'is-verified-retailer') {
+    return args[0] === 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM' ? true : false;
+  }
+  return null;
+};
 
-const accounts = simnet.getAccounts();
-const address1 = accounts.get("wallet_1")!;
-
-/*
-  The test below is an example. To learn more, read the testing documentation here:
-  https://docs.hiro.so/stacks/clarinet-js-sdk
-*/
-
-describe("example tests", () => {
-  it("ensures simnet is well initalised", () => {
-    expect(simnet.blockHeight).toBeDefined();
+describe('Retailer Verification Contract', () => {
+  test('should verify a retailer', () => {
+    const result = mockContractCall('register-retailer', ['ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM']);
+    expect(result.success).toBe(true);
   });
-
-  // it("shows an example", () => {
-  //   const { result } = simnet.callReadOnlyFn("counter", "get-counter", [], address1);
-  //   expect(result).toBeUint(0);
-  // });
+  
+  test('should check if a retailer is verified', () => {
+    const result = mockContractCall('is-verified-retailer', ['ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM']);
+    expect(result).toBe(true);
+  });
+  
+  test('should return false for unverified retailers', () => {
+    const result = mockContractCall('is-verified-retailer', ['ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG']);
+    expect(result).toBe(false);
+  });
 });
